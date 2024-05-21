@@ -148,8 +148,8 @@ source "proxmox-iso" "linux-server" {
     unmount                     = var.remove_cdrom
   }
   iso_checksum                  = local.iso_checksum
-  iso_file                      = local.iso_path
-  // iso_url                       = var.iso_url
+  // iso_file                      = local.iso_path
+  iso_url                       = var.iso_url
   iso_download_pve              = true
   iso_storage_pool              = local.proxmox_iso_storage_pool
   unmount_iso                   = var.remove_cdrom
@@ -177,10 +177,10 @@ build {
     "source.proxmox-iso.linux-server"
   ]
 
-  // provisioner "file" {
-  //   source                      = "certs"
-  //   destination                 = "/tmp"
-  // }
+  provisioner "file" {
+    source                      = "certs"
+    destination                 = "/tmp"
+  }
 
   provisioner "file" {
     source                      = "scripts/linux/join-domain.sh"
