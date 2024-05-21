@@ -5,6 +5,7 @@ Build Linux server templates on Proxmox with Packer
 ### Currently supported builds:
 #### Linux
 - [Ubuntu Server 22.04 LTS](builds/linux/ubuntu/22-04-lts/) (`ubuntu2204`)
+- [Ubuntu Server 24.04 LTS](builds/linux/ubuntu/24-04-lts/) (`ubuntu2404`)
 
 To run a build locally (not via GitLab CI), you'll need to first export a few Vault-related environment variables:
 ```shell
