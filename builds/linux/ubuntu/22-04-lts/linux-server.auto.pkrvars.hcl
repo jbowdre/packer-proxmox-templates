@@ -1,5 +1,5 @@
 /*
-  Ubuntu Server 22.04 LTS  variables used by the Packer Plugin for VMware vSphere (vsphere-iso).
+  Ubuntu Server 22.04 LTS  variables used by the Packer Builder for Proxmox.
 */
 
 // Guest Operating System Metadata
