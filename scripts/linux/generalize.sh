@@ -1,4 +1,5 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash
+set -eu
 # Prepare a VM to become a template.
 
 echo '>> Clearing audit logs...'

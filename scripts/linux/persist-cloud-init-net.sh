@@ -1,4 +1,5 @@
-#!/bin/sh -eu
+#!/usr/bin/bash
+set -eu
 echo '>> Preserving network settings...'
 if grep -q 'manual_cache_clean' /etc/cloud/cloud.cfg; then
   sudo sed -i 's/^manual_cache_clean.*$/manual_cache_clean: True/' /etc/cloud/cloud.cfg

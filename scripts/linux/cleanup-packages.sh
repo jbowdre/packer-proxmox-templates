@@ -1,4 +1,5 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash
+set -eu
 if awk -F= '/^ID/{print $2}' /etc/os-release | grep -q debian; then
   echo '>> Cleaning up unneeded packages...'
   sudo apt-get -y autoremove --purge

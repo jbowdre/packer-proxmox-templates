@@ -1,4 +1,5 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash
+set -eu
 if awk -F= '/^ID/{print $2}' /etc/os-release | grep -q debian; then
   echo '>> Installing certificates...'
   sudo cp /tmp/certs/* /usr/local/share/ca-certificates/

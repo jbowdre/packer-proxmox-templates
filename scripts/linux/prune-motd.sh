@@ -1,4 +1,5 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash
+set -eu
 echo '>> Pruning default MOTD...'
 
 if awk -F= '/^ID/{print $2}' /etc/os-release | grep -q rhel; then
