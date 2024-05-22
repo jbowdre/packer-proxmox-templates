@@ -619,7 +619,7 @@ current_task "$rule_name"
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw allow ssh
-sudo ufw enable
+sudo ufw --force enable
 sudo systemctl enable ufw.service
 sudo systemctl start ufw.service
 # avoid clobbering desired sysctl config
