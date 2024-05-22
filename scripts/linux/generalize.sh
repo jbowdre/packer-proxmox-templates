@@ -59,3 +59,6 @@ unset HISTFILE
 history -cw
 echo > ~/.bash_history
 sudo rm -f /root/.bash_history
+
+echo '>> Clearing sudoers.d...'
+sudo rm -f /etc/sudoers.d/*
