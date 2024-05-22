@@ -12,23 +12,6 @@ rule_name="Install AIDE"
 current_task "$rule_name"
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y aide
 
-rule_name="Ensure Only Users Logged In To Real tty Can Execute Sudo - sudo use_pty"
-current_task "$rule_name"
-if sudo /usr/sbin/visudo -qcf /etc/sudoers; then
-  sudo cp /etc/sudoers /etc/sudoers.bak
-  echo "Defaults use_pty" | sudo tee -a /etc/sudoers
-  if sudo /usr/sbin/visudo -qcf /etc/sudoers; then
-    sudo rm -f /etc/sudoers.bak
-  else
-    echo "Fail to validate remediated /etc/sudoers, reverting to original file."
-    sudo mv /etc/sudoers.bak /etc/sudoers
-    false
-  fi
-else
-  echo "Skipping remediation, /etc/sudoers failed to validate"
-  false
-fi
-
 rule_name="Ensure Sudo Logfile Exists - sudo logfile"
 current_task "$rule_name"
 sudo_logfile="/var/log/sudo.log"
