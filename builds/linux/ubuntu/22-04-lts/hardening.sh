@@ -98,7 +98,7 @@ Password-Type: Additional
 Password:
     requisite                       pam_pwhistory.so use_authtok remember=$password_pam_history
 EOF
-sudo pam-auth-update --package
+sudo DEBIAN_FRONTEND=noninteractive pam-auth-update --package
 
 rule_name="Lock Accounts After Failed Password Attempts"
 current_task "$rule_name"
@@ -122,7 +122,7 @@ Auth:
     [default=die]                   pam_faillock.so authfail
     sufficient                      pam_faillock.so authsucc
 EOF
-sudo pam-auth-update --package
+sudo DEBIAN_FRONTEND=noninteractive pam-auth-update --package
 password_pam_faillock_deny='4'
 FAILLOCK_CONF="/etc/security/faillock.conf"
 regex="^\s*deny\s*="
