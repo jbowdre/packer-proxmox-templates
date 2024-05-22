@@ -2,10 +2,10 @@
 # Prepare a VM to become a template.
 
 echo '>> Clearing audit logs...'
-sudo sh -c 'if [ -f /var/log/audit/audit.log ]; then 
-  cat /dev/null > /var/log/audit/audit.log 
+sudo sh -c 'if [ -f /var/log/audit/audit.log ]; then
+  cat /dev/null > /var/log/audit/audit.log
   fi'
-sudo sh -c 'if [ -f /var/log/wtmp ]; then 
+sudo sh -c 'if [ -f /var/log/wtmp ]; then
   cat /dev/null > /var/log/wtmp
   fi'
 sudo sh -c 'if [ -f /var/log/lastlog ]; then
