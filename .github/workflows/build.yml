@@ -1,0 +1,51 @@
+name: Build VM Templates
+
+on:
+  workflow_dispatch:
+
+env:
+  VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+  # VAULT_NAMESPACE: ${{ secrets.VAULT_NAMESPACE }} # Uncomment if using a namespace
+  VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: self-hosted
+    outputs:
+      gh_uid: ${{ steps.runner_uid.outputs.gh_uid }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Renew Vault Token
+        run: |
+          curl -s --header "X-Vault-Token:${VAULT_TOKEN}" \
+            --request POST "${VAULT_ADDR}v1/auth/token/renew-self" | grep -q auth
+      - name: Get UID of Github user
+        id: runner_uid
+        run: |
+          echo "gh_uid=$(id -u)" >> "$GITHUB_OUTPUT"
+
+  builds:
+    name: Build VM Templates
+    needs: prepare
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        build-flavor:
+          # - rhel8
+          # - rhel9
+          # - rocky8
+          # - rocky9
+          # - ubuntu2004
+          - ubuntu2204
+          - ubuntu2404
+          # - ws2019
+          # - ws2022
+    env:
+      DOCKER_HOST: unix:///run/user/${{ needs.prepare.outputs.gh_uid }}/docker.sock
+    steps:
+      - name: Execute Packer Build
+        uses: ./.github/actions/packerbuild
+        with:
+          build-flavor: ${{ matrix.build-flavor }}
