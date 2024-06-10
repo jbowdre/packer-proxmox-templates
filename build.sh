@@ -7,7 +7,7 @@ set -eu
 
 if [ ! "${VAULT_TOKEN+x}" ]; then
   #shellcheck disable=SC1091
-  source vault-env.sh
+  source vault-env.sh || ( echo "No Vault config found"; exit 1 )
 fi
 
 if [ $# -ne 1 ]; then

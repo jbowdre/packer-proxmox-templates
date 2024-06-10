@@ -44,7 +44,7 @@ export VAULT_NAMESPACE=""                         # (only need if using namespac
 export VAULT_TOKEN="hvs.abcdefg"                  # insert a Vault token ID
 ```
 
-Alternatively, put those same `export` commands into a script called `vault-env.sh`.
+Alternatively, put those same `export` commands into a script called `vault-env.sh` which will be sourced automatically as needed.
 
 Then just run `./build.sh [BUILD]`, where `[BUILD]` is one of the descriptors listed above. For example, to build Ubuntu 22.04:
 ```shell
