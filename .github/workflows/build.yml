@@ -45,7 +45,15 @@ jobs:
     env:
       DOCKER_HOST: unix:///run/user/${{ needs.prepare.outputs.gh_uid }}/docker.sock
     steps:
-      - name: Execute Packer Build
+      - name: Build template
+        id: build
+        uses: ./.github/actions/packerbuild
+        with:
+          build-flavor: ${{ matrix.build-flavor }}
+        continue-on-error: true
+      - name: Retry on failure
+        id: retry
+        if: steps.build.outcome == 'failure'
         uses: ./.github/actions/packerbuild
         with:
           build-flavor: ${{ matrix.build-flavor }}
