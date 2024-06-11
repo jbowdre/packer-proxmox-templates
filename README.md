@@ -32,11 +32,13 @@ You should use a `kv_v2` secrets engine mounted at `packer`. It should contain t
 | `public_key`          | `ssh-ed25519 AAAAC3NzaC1[...]lXLUI5I40 admin@example.com` | SSH public key for the user                                                                     |
 | `username`            | `admin`                                                   | build account username                                                                          |
 
-### Currently supported builds
-#### Linux
+### Building
+
+Currently-supported OS flavors:
 - [Ubuntu Server 22.04 LTS](builds/linux/ubuntu/22-04-lts/) (`ubuntu2204`)
 - [Ubuntu Server 24.04 LTS](builds/linux/ubuntu/24-04-lts/) (`ubuntu2404`)
 
+#### Local
 To run a build locally, you'll need to first export a few Vault-related environment variables:
 ```shell
 export VAULT_ADDR="https://vault.example.com/"    # your Vault server
@@ -50,3 +52,8 @@ Then just run `./build.sh [BUILD]`, where `[BUILD]` is one of the descriptors li
 ```shell
 ./build.sh ubuntu2204
 ```
+
+#### GitHub Actions
+This repo contains a sample GitHub Actions workflow for running automated builds on a self-hosted runner configured with rootless Docker. The runner will need to have connectivity to the Vault server to be able to retrieve secrets.
+
+See notes on runner configuration [here](rootless-runner.md).

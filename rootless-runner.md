@@ -1,21 +1,21 @@
 # Self-hosted Runner with rootless Docker
 
-Ubuntu 22.04
+These are the steps I used to configure an Ubuntu 22.04 VM to function as a GitHub Runner with rootless Docker.
 
-Create GitHub user
+1. Create GitHub user
 ```shell
 sudo useradd -m -G sudo -s $(which bash) github
 sudo passwd github
 ```
 
-Log in as `github`
+2. Log in as `github`
 
-Install prereqs
+3. Install `uidmap`
 ```shell
 sudo apt install uidmap
 ```
 
-Install Docker
+4. Install Docker
 ```shell
 # Add Docker's official GPG key:
 sudo apt-get update
@@ -34,7 +34,7 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-Install rootless
+5. Enable rootless Docker
 ```shell
 sudo systemctl disable --now docker.service docker.socket
 sudo rm /var/run/docker.sock
@@ -46,16 +46,16 @@ systemctl --user enable docker
 sudo loginctl enable-linger $(whoami)
 ```
 
-Then follow GitHub's instructions on installing the runner package.
+6. Follow [GitHub's instructions](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners) on installing the runner package.
 
-Configure it to start at boot
+7. Configure it to start at boot
 ```shell
 sudo ./svc.sh install
 ```
 
-Remove `github` from sudo group
+8. Remove `github` from sudo group as it won't need any further elevation
 ```shell
 sudo deluser github sudo
 ```
 
-And reboot for good measure. The runner should show as "idle" from GitHub.
+9. Reboot for good measure. The runner should show as "idle" on the GitHub side.
