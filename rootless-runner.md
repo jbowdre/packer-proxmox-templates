@@ -46,16 +46,33 @@ systemctl --user enable docker
 sudo loginctl enable-linger $(whoami)
 ```
 
-6. Follow [GitHub's instructions](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners) on installing the runner package.
-
-7. Configure it to start at boot
+6. Create a directory for the runner, and/or one for each runner instance if you want parallel builds
 ```shell
-sudo ./svc.sh install
+sudo mkdir -p /opt/github/{runner1,runner2}
+sudo chown -R github:github /opt/github
+```
+
+7. For each runner:
+  1. `cd` to the runner dir
+```shell
+cd /opt/github/runner1
+```
+  2. Download/extract runner software
+```shell
+curl -O -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-x64-2.317.0.tar.gz
+tar xzf ./actions-runner-linux-x64-2.317.0.tar.gz
+```
+  3. [Add a self-hosted runner to your repository](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners#adding-a-self-hosted-runner-to-a-repository) and run the prescribed config command *making sure to give each runner a unique name*
+```shell
+./config.sh --url https://github.com/USER/REPO --token TOKEN
+```
+  4. Configure it to run as a user service
+```shell
+sudo ./svc.sh install $(whoami)
+sudo ./svc.sh start $(whoami)
 ```
 
 8. Remove `github` from sudo group as it won't need any further elevation
 ```shell
 sudo deluser github sudo
 ```
-
-9. Reboot for good measure. The runner should show as "idle" on the GitHub side.
