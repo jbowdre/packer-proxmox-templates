@@ -15,8 +15,6 @@ jobs:
     outputs:
       gh_uid: ${{ steps.runner_uid.outputs.gh_uid }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: Renew Vault Token
         run: |
           curl -s --header "X-Vault-Token:${VAULT_TOKEN}" \
@@ -45,6 +43,8 @@ jobs:
     env:
       DOCKER_HOST: unix:///run/user/${{ needs.prepare.outputs.gh_uid }}/docker.sock
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Build template
         id: build
         uses: ./.github/actions/packerbuild
