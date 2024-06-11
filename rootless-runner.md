@@ -46,9 +46,16 @@ systemctl --user enable docker
 sudo loginctl enable-linger $(whoami)
 ```
 
-Remove `github` from sudo group
+Then follow GitHub's instructions on installing the runner package.
+
+Configure it to start at boot
 ```shell
-sudo userdel github sudo
+sudo ./svc.sh install
 ```
 
-Then follow GitHub's instructions on setting up the runner package.
+Remove `github` from sudo group
+```shell
+sudo deluser github sudo
+```
+
+And reboot for good measure. The runner should show as "idle" from GitHub.
