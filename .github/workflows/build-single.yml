@@ -1,0 +1,50 @@
+name: Build Single Template
+# Must set BUILD_FLAVOR as a repo environment variable
+
+on:
+  workflow_dispatch:
+
+env:
+  VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+  # VAULT_NAMESPACE: ${{ secrets.VAULT_NAMESPACE }} # Uncomment if using a namespace
+  VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: self-hosted
+    steps:
+      - name: Renew Vault Token
+        run: |
+          curl -s --header "X-Vault-Token:${VAULT_TOKEN}" \
+            --request POST "${VAULT_ADDR}v1/auth/token/renew-self" | grep -q auth
+
+  builds:
+    name: Build
+    needs: prepare
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get UID of Github user
+        id: runner_uid
+        run: |
+          echo "gh_uid=$(id -u)" >> "$GITHUB_OUTPUT"
+      - name: Build template
+        id: build
+        uses: ./.github/actions/packerbuild
+        timeout-minutes: 90
+        env:
+          DOCKER_HOST: unix:///run/user/${{ steps.runner_uid.outputs.gh_uid }}/docker.sock
+        with:
+          build-flavor: ${{ vars.BUILD_FLAVOR }}
+        continue-on-error: true
+      - name: Retry on failure
+        id: retry
+        if: steps.build.outcome == 'failure'
+        uses: ./.github/actions/packerbuild
+        timeout-minutes: 90
+        env:
+          DOCKER_HOST: unix:///run/user/${{ steps.runner_uid.outputs.gh_uid }}/docker.sock
+        with:
+          build-flavor: ${{ vars.BUILD_FLAVOR }}
