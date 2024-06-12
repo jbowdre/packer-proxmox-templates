@@ -19,7 +19,7 @@ jobs:
             --request POST "${VAULT_ADDR}v1/auth/token/renew-self" | grep -q auth
 
   builds:
-    name: Build VM Templates
+    name: Build
     needs: prepare
     runs-on: self-hosted
     strategy:
