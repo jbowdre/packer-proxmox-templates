@@ -56,4 +56,8 @@ Then just run `./build.sh [BUILD]`, where `[BUILD]` is one of the descriptors li
 #### GitHub Actions
 This repo contains a sample GitHub Actions workflow for running automated builds on a self-hosted runner configured with rootless Docker. The runner will need to have connectivity to the Vault server to be able to retrieve secrets.
 
-See notes on runner configuration [here](rootless-runner.md).
+> **NOTE**
+> Self-hosted runners [should *only* be used on private GitHub repos](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#self-hosted-runner-security). You don't want a PR from a fork to trigger arbitrary code execution on your infrastructure. This public repo is where I share my code with you, but I actually run the workflows from a private repo which is an otherwise exact copy of this one.
+> So if you'd like to use this code for your own automated build process, clone it locally then push it to your own *private* GitHub repo.
+
+Okay with that disclaimer out of the way, see my notes on runner configuration [here](rootless-runner.md).

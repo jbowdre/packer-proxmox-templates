@@ -9,6 +9,9 @@ sudo passwd github
 ```
 
 2. Log in as `github`
+```shell
+sudo su - github
+```
 
 3. Install `uidmap`
 ```shell
@@ -53,24 +56,24 @@ sudo chown -R github:github /opt/github
 ```
 
 7. For each runner:
-  1. `cd` to the runner dir
-```shell
-cd /opt/github/runner1
-```
-  2. Download/extract runner software
-```shell
-curl -O -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-x64-2.317.0.tar.gz
-tar xzf ./actions-runner-linux-x64-2.317.0.tar.gz
-```
-  3. [Add a self-hosted runner to your repository](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners#adding-a-self-hosted-runner-to-a-repository) and run the prescribed config command *making sure to give each runner a unique name*
-```shell
-./config.sh --url https://github.com/USER/REPO --token TOKEN
-```
-  4. Configure it to run as a user service
-```shell
-sudo ./svc.sh install $(whoami)
-sudo ./svc.sh start $(whoami)
-```
+>   -  `cd` to the runner dir
+> ```shell
+> cd /opt/github/runner1
+> ```
+>   - Download/extract runner software
+> ```shell
+> curl -O -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-x64-2.317.0.tar.gz
+> tar xzf ./actions-runner-linux-x64-2.317.0.tar.gz
+> ```
+>   -  [Add a self-hosted runner to your repository](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners#adding-a-self-hosted-runner-to-a-repository) and run the prescribed config command *making sure to give each runner a unique name*
+> ```shell
+> ./config.sh --url https://github.com/USER/REPO --token TOKEN
+> ```
+>   - Configure it to run as a user service
+> ```shell
+> sudo ./svc.sh install $(whoami)
+> sudo ./svc.sh start $(whoami)
+> ```
 
 8. Remove `github` from sudo group as it won't need any further elevation
 ```shell
