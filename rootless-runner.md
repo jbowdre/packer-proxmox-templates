@@ -51,7 +51,7 @@ sudo loginctl enable-linger $(whoami)
 
 6. Create a directory for the runner (or one for each runner instance if you want parallel builds), set perms, and `cd` into the parent directory
 ```shell
-sudo mkdir -p /opt/github/{runner1,runner2}
+sudo mkdir -p /opt/github/runner{1..4}
 sudo chown -R github:github /opt/github
 cd /opt/github
 ```
