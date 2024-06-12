@@ -44,6 +44,7 @@ jobs:
       - name: Build template
         id: build
         uses: ./.github/actions/packerbuild
+        timeout-minutes: 90
         env:
           DOCKER_HOST: unix:///run/user/${{ steps.runner_uid.outputs.gh_uid }}/docker.sock
         with:
@@ -53,6 +54,7 @@ jobs:
         id: retry
         if: steps.build.outcome == 'failure'
         uses: ./.github/actions/packerbuild
+        timeout-minutes: 90
         env:
           DOCKER_HOST: unix:///run/user/${{ steps.runner_uid.outputs.gh_uid }}/docker.sock
         with:
