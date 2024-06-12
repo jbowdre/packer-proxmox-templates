@@ -12,17 +12,11 @@ jobs:
   prepare:
     name: Prepare
     runs-on: self-hosted
-    outputs:
-      gh_uid: ${{ steps.runner_uid.outputs.gh_uid }}
     steps:
       - name: Renew Vault Token
         run: |
           curl -s --header "X-Vault-Token:${VAULT_TOKEN}" \
             --request POST "${VAULT_ADDR}v1/auth/token/renew-self" | grep -q auth
-      - name: Get UID of Github user
-        id: runner_uid
-        run: |
-          echo "gh_uid=$(id -u)" >> "$GITHUB_OUTPUT"
 
   builds:
     name: Build VM Templates
@@ -40,14 +34,18 @@ jobs:
           - ubuntu2404
           # - ws2019
           # - ws2022
-    env:
-      DOCKER_HOST: unix:///run/user/${{ needs.prepare.outputs.gh_uid }}/docker.sock
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Get UID of Github user
+        id: runner_uid
+        run: |
+          echo "gh_uid=$(id -u)" >> "$GITHUB_OUTPUT"
       - name: Build template
         id: build
         uses: ./.github/actions/packerbuild
+        env:
+          DOCKER_HOST: unix:///run/user/${{ steps.runner_uid.outputs.gh_uid }}/docker.sock
         with:
           build-flavor: ${{ matrix.build-flavor }}
         continue-on-error: true
@@ -55,5 +53,7 @@ jobs:
         id: retry
         if: steps.build.outcome == 'failure'
         uses: ./.github/actions/packerbuild
+        env:
+          DOCKER_HOST: unix:///run/user/${{ steps.runner_uid.outputs.gh_uid }}/docker.sock
         with:
           build-flavor: ${{ matrix.build-flavor }}
