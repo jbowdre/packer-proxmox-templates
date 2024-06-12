@@ -49,24 +49,26 @@ systemctl --user enable docker
 sudo loginctl enable-linger $(whoami)
 ```
 
-6. Create a directory for the runner, and/or one for each runner instance if you want parallel builds
+6. Create a directory for the runner (or one for each runner instance if you want parallel builds), set perms, and `cd` into the parent directory
 ```shell
 sudo mkdir -p /opt/github/{runner1,runner2}
 sudo chown -R github:github /opt/github
+cd /opt/github
 ```
 
-7. For each runner:
->   -  `cd` to the runner dir
+7. Download the runner softare
+```shell
+curl -O -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-x64-2.317.0.tar.gz
+```
+
+9. For each runner:
+>   - Extract runner software into the runner dir
 > ```shell
-> cd /opt/github/runner1
-> ```
->   - Download/extract runner software
-> ```shell
-> curl -O -L https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-x64-2.317.0.tar.gz
-> tar xzf ./actions-runner-linux-x64-2.317.0.tar.gz
+> tar xzf ./actions-runner-linux-x64-2.317.0.tar.gz --directory=runner1
 > ```
 >   -  [Add a self-hosted runner to your repository](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners#adding-a-self-hosted-runner-to-a-repository) and run the prescribed config command *making sure to give each runner a unique name*
 > ```shell
+> cd runner1
 > ./config.sh --url https://github.com/USER/REPO --token TOKEN
 > ```
 >   - Configure it to run as a user service
@@ -75,7 +77,7 @@ sudo chown -R github:github /opt/github
 > sudo ./svc.sh start $(whoami)
 > ```
 
-8. Remove `github` from sudo group as it won't need any further elevation
+10. Remove `github` from sudo group as it won't need any further elevation
 ```shell
 sudo deluser github sudo
 ```
