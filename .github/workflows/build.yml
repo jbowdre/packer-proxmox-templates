@@ -2,7 +2,7 @@ name: Build VM Templates
 
 on:
   schedule:
-    - cron: '0 9 * * 5'
+    - cron: '0 */8 * * *'
 
 env:
   VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
