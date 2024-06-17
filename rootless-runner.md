@@ -8,9 +8,12 @@ sudo useradd -m -G sudo -s $(which bash) github
 sudo passwd github
 ```
 
-2. Log in as `github`
+2. Log in as `github` using `machinectl` (the rootless setup script won't work correctly if you just `sudo su - $USER)
 ```shell
-sudo su - github
+# install systemd-container if not already installed
+sudo apt install systemd-container
+# login as github
+sudo machinectl shell github@
 ```
 
 3. Install `uidmap`
