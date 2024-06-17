@@ -8,7 +8,7 @@ sudo useradd -m -G sudo -s $(which bash) github
 sudo passwd github
 ```
 
-2. Log in as `github` using `machinectl` (the rootless setup script won't work correctly if you just `sudo su - $USER)
+2. Log in as `github` using `machinectl` (the rootless setup script won't work correctly if you just `sudo su - $USER`)
 ```shell
 # install systemd-container if not already installed
 sudo apt install systemd-container
