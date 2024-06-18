@@ -38,6 +38,6 @@ case $build_name in
 esac
 
 packer init "${build_path}"
-packer build -on-error=abort -force "${build_path}"
+packer build -on-error=cleanup -force "${build_path}"
 
 
