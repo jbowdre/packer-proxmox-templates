@@ -3,7 +3,7 @@ name: Build VM Templates
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 8 * * *'
+    - cron: '0 8 * * 1'
 
 env:
   VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
