@@ -72,7 +72,6 @@ locals {
   build_tool                    = "HashiCorp Packer ${packer.version}"
   iso_checksum                  = "${var.iso_checksum_type}:${var.iso_checksum_value}"
   iso_path                      = "${local.proxmox_iso_path}/${var.iso_file}"
-  shutdown_command              = "sudo sh -c 'rm -f /etc/sudoers.d/*; /usr/sbin/shutdown -P now'"
   ssh_private_key_file          = data.sshkey.install.private_key_path
   ssh_public_key                = data.sshkey.install.public_key
   data_source_content = {
