@@ -166,7 +166,6 @@ source "proxmox-iso" "linux-server" {
   ssh_private_key_file          = local.ssh_private_key_file
   ssh_timeout                   = var.communicator_timeout
   ssh_username                  = local.build_username
-
 }
 
 //  BLOCK: build
