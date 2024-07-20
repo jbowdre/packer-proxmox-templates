@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+# prepare a VM to become a template.
+
 set -eu
-# Prepare a VM to become a template.
 
 echo '>> Clearing audit logs...'
 sudo sh -c 'if [ -f /var/log/audit/audit.log ]; then

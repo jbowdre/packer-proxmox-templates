@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
+# cleans up unneeded packages to reduce the size of the image
+
 set -eu
+
 if awk -F= '/^ID/{print $2}' /etc/os-release | grep -q debian; then
   echo '>> Cleaning up unneeded packages...'
   sudo apt-get -y autoremove --purge
@@ -18,6 +21,4 @@ elif awk -F= '/^ID/{print $2}' /etc/os-release | grep -q rhel; then
     sudo yum -y autoremove
     sudo yum -y clean all --enablerepo=\*;
   fi
-elif awk -F= '/^ID/{print $2}' /etc/os-release | grep photon; then
-  sudo tdnf -y clean all --enablerepo=\*;
 fi

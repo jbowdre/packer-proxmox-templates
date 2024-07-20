@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
+# updates packages and reboots
+
 set -eu
+
 if awk -F= '/^ID/{print $2}' /etc/os-release | grep -q rhel; then
   if which dnf &>/dev/null; then
     echo '>> Checking for and installing updates...'

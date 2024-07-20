@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
+# installs trusted CA certs from /tmp/certs/
+
 set -eu
+
 if awk -F= '/^ID/{print $2}' /etc/os-release | grep -q debian; then
   echo '>> Installing certificates...'
   if ls /tmp/certs/*.cer >/dev/null 2>&1; then
