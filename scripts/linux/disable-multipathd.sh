@@ -3,4 +3,4 @@
 set -eu
 
 sudo systemctl disable multipathd
-echo 'Disabling multipathd'
+echo '>> Disabling multipathd'
