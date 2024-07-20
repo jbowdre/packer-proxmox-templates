@@ -26,16 +26,4 @@ elif awk -F= '/^ID/{print $2}' /etc/os-release | grep -q rhel; then
   else
     echo 'No certs to install.'
   fi
-elif awk -F= '/^ID/{print $2}' /etc/os-release | grep -q photon; then
-  echo '>> Installing certificates...'
-  if ls /tmp/certs/*.cer >/dev/null 2>&1; then
-    sudo cp /tmp/certs/* /etc/ssl/certs/
-    cd /etc/ssl/certs/
-    for file in *.cer; do
-      sudo mv -- "$file" "${file%.cer}.pem"
-    done
-    sudo /usr/bin/rehash_ca_certificates.sh
-  else
-    echo 'No certs to install.'
-  fi
 fi

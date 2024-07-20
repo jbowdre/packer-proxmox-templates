@@ -38,8 +38,6 @@ sudo rm -rf /var/tmp/*
 if awk -F= '/^ID/{print $2}' /etc/os-release | grep -q rhel; then
   sudo rm -rf /var/cache/dnf/*
   sudo rm -rf /var/log/rhsm/*
-elif awk -F= '/^ID/{print $2}' /etc/os-release | grep -q photon; then
-  sudo rm -rf /var/cache/tdnf/*
 fi
 
 echo '>> Clearing host keys...'
