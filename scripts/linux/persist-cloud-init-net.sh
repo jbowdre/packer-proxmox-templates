@@ -1,6 +1,5 @@
 #!/usr/bin/bash
 # ensures network settings are preserved on boot
-
 set -eu
 
 echo '>> Preserving network settings...'

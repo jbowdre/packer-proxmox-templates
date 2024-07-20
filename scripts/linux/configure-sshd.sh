@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # basic sshd configuration
-
 set -eu
 
 echo '>> Configuring SSH'

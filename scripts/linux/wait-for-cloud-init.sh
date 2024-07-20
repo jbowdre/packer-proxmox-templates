@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # waits for cloud-init to finish before proceeding
-
 set -eu
 
 echo '>> Waiting for cloud-init...'

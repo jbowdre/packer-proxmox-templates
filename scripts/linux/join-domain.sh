@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # This script can help to join a Linux machine to an Active Directory domain
 # using SSSD. It needs to be run interactively post-deployment.
-
 set -eu
 
 domain='lab.example.com'

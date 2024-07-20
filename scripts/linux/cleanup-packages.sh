@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # cleans up unneeded packages to reduce the size of the image
-
 set -eu
 
 if awk -F= '/^ID/{print $2}' /etc/os-release | grep -q debian; then

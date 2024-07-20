@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # ensures home directories are private
-
 set -eu
 
 sudo chmod 750 /home/*

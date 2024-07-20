@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # zeroes out free space to reduce disk size
-
 set -eu
 
 echo '>> Zeroing free space to reduce disk size'

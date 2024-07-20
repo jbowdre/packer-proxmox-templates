@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # installs cloud-init on RHEL-based systems
-
 set -eu
 
 if which dnf &>/dev/null; then
