@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 # ensures network settings are preserved on boot
 set -eu
 
