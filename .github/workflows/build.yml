@@ -7,7 +7,6 @@ on:
 
 env:
   VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
-  # VAULT_NAMESPACE: ${{ secrets.VAULT_NAMESPACE }} # Uncomment if using a namespace
   VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
 
 jobs:
@@ -27,15 +26,8 @@ jobs:
     strategy:
       matrix:
         build-flavor:
-          # - rhel8
-          # - rhel9
-          # - rocky8
-          # - rocky9
-          # - ubuntu2004
           - ubuntu2204
           - ubuntu2404
-          # - ws2019
-          # - ws2022
     steps:
       - name: Checkout
         uses: actions/checkout@v4
