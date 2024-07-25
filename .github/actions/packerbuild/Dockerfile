@@ -1,4 +1,4 @@
-FROM docker.mirror.hashicorp.services/alpine:latest
+FROM alpine:3.20
 
 ENV PACKER_VERSION=1.10.3
 
