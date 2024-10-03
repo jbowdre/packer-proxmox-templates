@@ -6,10 +6,10 @@
 //  The Packer configuration.
 
 packer {
-  required_version              = ">= 1.9.4"
+  required_version              = "= 1.10.3"
   required_plugins {
     proxmox = {
-      version                   = ">= 1.1.8"
+      version                   = "= 1.1.8"
       source                    = "github.com/hashicorp/proxmox"
     }
     ssh-key = {
