@@ -35,9 +35,9 @@ vm_scsi_controller      = "virtio-scsi-single"
 
 // Removable Media Settings
 iso_checksum_type       = "sha256"
-iso_checksum_value      = "45f873de9f8cb637345d6e66a583762730bbea30277ef7b32c9c3bd6700a32b2"
-iso_file                = "ubuntu-22.04.4-live-server-amd64.iso"
-iso_url                 = "https://releases.ubuntu.com/jammy/ubuntu-22.04.4-live-server-amd64.iso"
+iso_checksum_value      = "9bc6028870aef3f74f4e16b900008179e78b130e6b0b9a140635434a46aa98b0"
+iso_file                = "ubuntu-22.04.5-live-server-amd64.iso"
+iso_url                 = "https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso"
 remove_cdrom            = true
 
 // Boot Settings
