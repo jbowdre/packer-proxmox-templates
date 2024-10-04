@@ -6,6 +6,11 @@ Build Linux server templates on Proxmox with Packer ([proxmox-iso](https://devel
 - [Packer](https://developer.hashicorp.com/packer/install) (duh)
 - [Vault](https://developer.hashicorp.com/vault/install) (for storing environment secrets)
 
+
+### Blog posts
+- [Building Proxmox Templates with Packer](https://runtimeterror.dev/building-proxmox-templates-packer/)
+- [Automate Packer Builds with GithHub Actions](https://runtimeterror.dev/automate-packer-builds-github-actions/)
+
 #### Vault layout
 To minimize the effort required to tailor deployments to your environment, this Packer setup assumes that you're storing all of your environment-specific information (not just sensitive credentials!) in Vault. You shouldn't really need to modify any of the variables stored in the `.hcl` files to get a functional build.
 
