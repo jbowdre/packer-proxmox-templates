@@ -531,7 +531,7 @@ rule_name="Ensure audit logs are not automatically deleted"
 current_task "$rule_name"
 auditd_option_name="max_log_file_action"
 auditd_option_value="keep_logs"
-auditd_config_file="/etc/audit/audit.conf"
+auditd_config_file="/etc/audit/auditd.conf"
 sudo sed -i "s/^${auditd_option_name}.*$/${auditd_option_name} = ${auditd_option_value}/" "${auditd_config_file}"
 
 rule_name="Ensure system is disabled when audit logs are full"
