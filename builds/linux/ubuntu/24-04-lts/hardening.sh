@@ -402,7 +402,7 @@ for audit_item in "${audit_list[@]}"; do
     echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
   done
 done
-audit_command="-a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>= -F auid!=unset -k $audit_key"
+audit_command="-a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>=1000 -F auid!=unset -k $audit_key"
 echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
 
 rule_name="Ensure login and logout events are collected"
@@ -428,12 +428,11 @@ rule_name="Ensure auditd Collects Information on the Use of Privileged Commands"
 current_task "$rule_name"
 audit_key="privileged"
 audit_rule_file="/etc/audit/rules.d/${audit_key}.rules"
-uid_min="$(awk '/^\s*UID MIN/{print $2}' /etc/login.defs)"
 new_data=()
 sudo touch "${audit_rule_file}"
 sudo chmod 0640 "${audit_rule_file}"
 for partition in $(findmnt -n -l -k -it $(awk '/nodev/ { print $2 }' /proc/filesystems | paste -sd,) | grep -Pv "noexec|nosuid" | awk '{print $1}'); do
-  readarray -t data < <(sudo find "${partition}" -xdev -perm /6000 -type f | awk -v uid_min=${uid_min} '{print "-a always,exit -F path=" $1 " -F perm=x -F auid>="uid_min" -F auid!=unset -k privileged" }')
+  readarray -t data < <(sudo find "${partition}" -xdev -perm /6000 -type f | awk '{print "-a always,exit -F path=" $1 " -F perm=x -F auid>=1000 -F auid!=unset -k privileged" }')
   for entry in "${data[@]}"; do
     new_data+=("${entry}")
   done
