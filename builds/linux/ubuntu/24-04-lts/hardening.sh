@@ -946,20 +946,6 @@ sudo touch /etc/at.allow
 sudo chown root:daemon /etc/at.allow
 sudo chmod 0640 /etc/at.allow
 
-rule_name="Ensure access to all logfiles has been configured"
-current_task "$rule_name"
-log_files=(
-  "apt/history.log"
-  "landscape/sysinfo.log"
-  "unattended-upgrades/unattended-upgrades-shutdown.log"
-  "dpkg.log"
-  "alternatives.log"
-)
-mode="0640"
-for log_file in "${log_files[@]}"; do
-  sudo chmod "${mode}" "/var/log/${log_file}"
-done
-
 rule_name="Disable Postfix Network Listening"
 current_task "$rule_name"
 sudo sed -i 's/inet_interfaces = all/inet_interfaces = loopback-only/' /etc/postfix/main.cf
