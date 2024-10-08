@@ -659,6 +659,7 @@ sudo sed -i "s/\(^GRUB_CMDLINE_LINUX=\".*\)\"/\1 apparmor=1 security=apparmor\"/
 sudo update-grub
 
 # remediation currently broken
+# see https://gitlab.com/apparmor/apparmor/-/merge_requests/1218
 # rule_name="Ensure all AppArmor profiles are in enforcing mode"
 # current_task "$rule_name"
 # sudo aa-complain /etc/apparmor.d/*
