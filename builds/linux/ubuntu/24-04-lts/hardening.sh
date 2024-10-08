@@ -190,7 +190,7 @@ sudo sed -i --follow-symlinks "s/^# ucredit.*$/ucredit = $password_pam_ucredit/"
 rule_name="Ensure password number of changed characters is configured"
 current_task "$rule_name"
 password_pam_difok='2'
-sudo sed -i --follow-symlinks "s/^# difok.*$/difok = $password_pam_difok" /etc/security/pwquality.conf
+sudo sed -i --follow-symlinks "s/^# difok.*$/difok = $password_pam_difok/" /etc/security/pwquality.conf
 
 rule_name="Ensure password same consecutive characters is configured"
 current_task "$rule_name"
