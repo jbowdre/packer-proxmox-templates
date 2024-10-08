@@ -195,7 +195,7 @@ sudo sed -i --follow-symlinks "s/^# difok.*$/difok = $password_pam_difok/" /etc/
 rule_name="Ensure password same consecutive characters is configured"
 current_task "$rule_name"
 password_pam_maxrepeat='3'
-sudo sed -i --follow-symlinks "s/^# maxrepeat.*$/maxrepeat = $password_pam_maxrepeat" /etc/security/pwquality.conf
+sudo sed -i --follow-symlinks "s/^# maxrepeat.*$/maxrepeat = $password_pam_maxrepeat/" /etc/security/pwquality.conf
 
 rule_name="Ensure password maximum sequential characters is configured"
 current_task "$rule_name"
@@ -205,7 +205,7 @@ echo "maxsequence = $password_pam_maxsequence" | sudo tee -a /etc/security/pwqua
 rule_name="Ensure password dictionary check is configured"
 current_task "$rule_name"
 password_pam_dictcheck='1'
-sudo sed -i --follow-symlinks "s/^# dictcheck.*$/dictcheck = $password_pam_dictcheck" /etc/security/pwquality.conf
+sudo sed -i --follow-symlinks "s/^# dictcheck.*$/dictcheck = $password_pam_dictcheck/" /etc/security/pwquality.conf
 
 rule_name="Ensure password quality is enforced for the root user"
 current_task "$rule_name"
@@ -271,7 +271,7 @@ system_users=(
   "tss"
 )
 for system_user in "${system_users[@]}"; do
-  sudo usermod -s "$(command -v nologin)" $system_user
+  sudo usermod -s "$(command -v nologin)" "$system_user"
 done
 
 rule_name="Set Interactive Session Timeout"
