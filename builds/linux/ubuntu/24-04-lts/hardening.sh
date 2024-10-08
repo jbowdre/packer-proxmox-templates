@@ -55,31 +55,19 @@ fi
 
 rule_name="Modify the System Login Banner | Modify the System Login Banner for Remote Connections"
 current_task "$rule_name"
-login_banner_text="\
-I've read & consent to terms in IS user agreem't."
-cat << EOF | sudo tee /etc/issue
-\S
-Kernel \r on an \m
-
-$login_banner_text
-
-EOF
-cat << EOF | sudo tee /etc/issue.net
-
-$login_banner_text
-
-EOF
+login_banner_text="Authorized users only. All activity may be monitored and reported."
+echo "$login_banner_text" | sudo tee -a /etc/issue | sudo tee -a /etc/issue.net
 
 rule_name="Limit Password Reuse"
 current_task "$rule_name"
-password_pam_history='5'
+password_pam_history='24'
 cat << EOF | sudo tee /usr/share/pam-configs/pwhistory
 Name: pwhistory
 Default: yes
 Priority: 0
 Password-Type: Additional
 Password:
-    requisite                       pam_pwhistory.so use_authtok remember=$password_pam_history
+    requisite                       pam_pwhistory.so enforce_for_root use_authtok remember=$password_pam_history
 EOF
 sudo DEBIAN_FRONTEND=noninteractive pam-auth-update --package
 
@@ -116,6 +104,15 @@ else
   sudo sed -i --follow-symlinks 's|^\s*\(deny\s*=\s*\)\(\S\+\)|\1'"$password_pam_faillock_deny"'|g' "$FAILLOCK_CONF"
 fi
 
+rule_name="Ensure pam_unix does not include nullok"
+current_task "$rule_name"
+sudo sed -i --follow-symlinks 's/nullok//' /etc/pam.d/common-auth
+
+rule_name="Ensure strong password hashing algorithm is configured"
+current_task "$rule_name"
+sudo sed -i --follow-symlinks 's/yescrypt$//' /etc/pam.d/common-password
+sudo sed -i --follow-symlinks 's/^ENCRYPT_METHOD.*/ENCRYPT_METHOD yescrypt/' /etc/login.defs
+
 rule_name="Set Interval For Counting Failed Password Attempts"
 current_task "$rule_name"
 password_pam_faillock_interval='900'
@@ -138,6 +135,18 @@ if ! grep -q "$regex" "$FAILLOCK_CONF"; then
   echo "$line" | sudo tee -a "$FAILLOCK_CONF"
 else
   sudo sed -i --follow-symlinks 's|^\s*\(unlock_time\s*=\s*\)\(\S\+\)|\1'"$password_pam_faillock_time"'|g' "$FAILLOCK_CONF"
+fi
+
+rule_name="Ensure password failed attempts lockout includes root account"
+current_task "$rule_name"
+password_pam_root_faillock_time='60'
+FAILLOCK_CONF="/etc/security/faillock.conf"
+regex="^\s*root_unlock_time\s*="
+line="root_unlock_time = $password_pam_root_faillock_time"
+if ! grep -q "$regex" "$FAILLOCK_CONF"; then
+  echo "$line" | sudo tee -a "$FAILLOCK_CONF"
+else
+  sudo sed -i --follow-symlinks 's|^\s*\(root_unlock_time\s*=\s*\)\(\S\+\)|\1'"$password_pam_root_faillock_time"'|g' "$FAILLOCK_CONF"
 fi
 
 rule_name="Install pam_pwquality Package"
@@ -178,6 +187,30 @@ current_task "$rule_name"
 password_pam_ucredit='-1'
 sudo sed -i --follow-symlinks "s/^# ucredit.*$/ucredit = $password_pam_ucredit/" /etc/security/pwquality.conf
 
+rule_name="Ensure password number of changed characters is configured"
+current_task "$rule_name"
+password_pam_difok='2'
+sudo sed -i --follow-symlinks "s/^# difok.*$/difok = $password_pam_difok" /etc/security/pwquality.conf
+
+rule_name="Ensure password same consecutive characters is configured"
+current_task "$rule_name"
+password_pam_maxrepeat='3'
+sudo sed -i --follow-symlinks "s/^# maxrepeat.*$/maxrepeat = $password_pam_maxrepeat" /etc/security/pwquality.conf
+
+rule_name="Ensure password maximum sequential characters is configured"
+current_task "$rule_name"
+password_pam_maxsequence='3'
+echo "maxsequence = $password_pam_maxsequence" | sudo tee -a /etc/security/pwquality.conf
+
+rule_name="Ensure password dictionary check is configured"
+current_task "$rule_name"
+password_pam_dictcheck='1'
+sudo sed -i --follow-symlinks "s/^# dictcheck.*$/dictcheck = $password_pam_dictcheck" /etc/security/pwquality.conf
+
+rule_name="Ensure password quality is enforced for the root user"
+current_task "$rule_name"
+echo "enforce_for_root" | sudo tee -a /etc/security/pwquality.conf
+
 rule_name="Set Account Expiration Following Inactivity"
 current_task "$rule_name"
 password_inactive_days='30'
@@ -193,9 +226,10 @@ current_task "$rule_name"
 password_min_days='1'
 sudo sed -i "s/PASS_MIN_DAYS.*/PASS_MIN_DAYS\t$password_min_days/g" /etc/login.defs
 
-rule_name="Enforce usage of pam_wheel for su authentication"
+rule_name="Ensure access to the su command is restricted"
 current_task "$rule_name"
-echo -e "auth\trequired\tpam_wheel.so use_uid" | sudo tee -a /etc/pam.d/su
+sudo groupadd sugroup
+echo -e "auth\trequired\tpam_wheel.so use_uid group=sugroup" | sudo tee -a /etc/pam.d/su
 
 rule_name="Ensure the Default Bash Umask is Set Correctly | Ensure the Default C Shell Umask is Set Correctly | Ensure the Default Umask is Set Correctly in login.defs | Ensure the Default Umask is Set Correctly in /etc/profile"
 current_task "$rule_name"
@@ -228,6 +262,17 @@ if ! grep -q "^umask" /etc/profile; then
 else
   sudo sed -i -E -e "s/^(\s*umask).*/\1 $account_user_umask/g" /etc/profile
 fi
+
+rule_name="Ensure system accounts do not have a valid login shell"
+current_task "$rule_name"
+system_users=(
+  "dhcpcd"
+  "pollinate"
+  "tss"
+)
+for system_user in "${system_users[@]}"; do
+  sudo usermod -s "$(command -v nologin)" $system_user
+done
 
 rule_name="Set Interactive Session Timeout"
 current_task "$rule_name"
@@ -345,6 +390,9 @@ sudo chmod 0640 "${audit_rule_file}"
 audit_list=(
   "init_module"
   "delete_module"
+  "create_module"
+  "query_module"
+  "finit_module"
 )
 for audit_item in "${audit_list[@]}"; do
   audit_commands=(
@@ -355,17 +403,18 @@ for audit_item in "${audit_list[@]}"; do
     echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
   done
 done
+audit_command="-a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>= -F auid!=unset -k $audit_key"
+echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
 
-rule_name="Record Attempts to Alter Logon and Logout Events"
+rule_name="Ensure login and logout events are collected"
 current_task "$rule_name"
 audit_key="logins"
 audit_rule_file="/etc/audit/rules.d/${audit_key}.rules"
 sudo touch "${audit_rule_file}"
 sudo chmod 0640 "${audit_rule_file}"
 audit_list=(
-  "/var/log/faillog"
   "/var/log/lastlog"
-  "/var/log/tallylog"
+  "/var/run/faillock"
 )
 for audit_item in "${audit_list[@]}"; do
   audit_commands=(
@@ -380,37 +429,17 @@ rule_name="Ensure auditd Collects Information on the Use of Privileged Commands"
 current_task "$rule_name"
 audit_key="privileged"
 audit_rule_file="/etc/audit/rules.d/${audit_key}.rules"
+uid_min="$(awk '/^\s*UID MIN/{print $2}' /etc/login.defs)"
+new_data=()
 sudo touch "${audit_rule_file}"
 sudo chmod 0640 "${audit_rule_file}"
-audit_list=(
-  "/usr/bin/at"
-  "/usr/bin/chacl"
-  "/usr/bin/chage"
-  "/usr/bin/chcon"
-  "/usr/bin/chfn"
-  "/usr/bin/chsh"
-  "/usr/bin/crontab"
-  "/usr/bin/gpasswd"
-  "/usr/bin/mount"
-  "/usr/bin/newgidmap"
-  "/usr/bin/newgrp"
-  "/usr/bin/newuidmap"
-  "/usr/bin/setfacl"
-  "/usr/bin/ssh-agent"
-  "/usr/bin/su"
-  "/usr/bin/sudo"
-  "/usr/bin/sudoedit"
-  "/usr/bin/umount"
-  "/usr/libexec/openssh/ssh-keysign"
-  "/usr/sbin/postdrop"
-  "/usr/sbin/postqueue"
-  "/usr/sbin/unix_chkpwd"
-  "/usr/sbin/usermod"
-)
-for audit_item in "${audit_list[@]}"; do
-  audit_command="-a always,exit -F path=$audit_item -F perm=x -F auid>=1000 -F auid!=unset -F key=$audit_key"
-  echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
+for partition in $(findmnt -n -l -k -it $(awk '/nodev/ { print $2 }' /proc/filesystems | paste -sd,) | grep -Pv "noexec|nosuid" | awk '{print $1}'); do
+  readarray -t data < <(find "${partition}" -xdev -perm /6000 -type f | awk -v UID_MIN=${uid_min} '{print "-a always,exit -F path=" $1 " -F perm=x -F auid>="uid_min" -F auid!=unset -k privileged" }')
+  for entry in "${data[@]}"; do
+    new_data+=("${entry}")
+  done
 done
+printf '%s\n' "${new_data[@]}" | sudo tee -a "${audit_rule_file}"
 audit_list=(
   "/sbin/insmod"
   "/sbin/modprobe"
@@ -427,8 +456,13 @@ audit_key="mac-policy"
 audit_rule_file="/etc/audit/rules.d/${audit_key}.rules"
 sudo touch "${audit_rule_file}"
 sudo chmod 0640 "${audit_rule_file}"
-audit_command="-w /etc/selinux/ -p wa -k $audit_key"
-echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
+audit_commands=(
+  "-w /etc/apparmor/ -p wa -k $audit_key"
+  "-w /etc/apparmor.d/ -p wa -k $audit_key"
+)
+for audit_command in "${audit_commands[@]}"; do
+  echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
+done
 
 rule_name="Ensure auditd Collects Information on Exporting to Media (successful)"
 current_task "$rule_name"
@@ -438,15 +472,30 @@ sudo touch "${audit_rule_file}"
 sudo chmod 0640 "${audit_rule_file}"
 audit_commands=(
   "-a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=unset -F key=$audit_key"
-  "-a always,exit -F arch=b64 -S mount -F audi>=1000 -F auid!=unset -F key=$audit_key"
+  "-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=unset -F key=$audit_key"
 )
 for audit_command in "${audit_commands[@]}"; do
   echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
 done
 
+rule_name="Ensure successful and unsuccessful attempts to use the chcon command are collected"
+current_task "$rule_name"
+audit_key="privileged"
+audit_rule_file="/etc/audit/rules.d/${audit_key}.rules"
+audit_items=(
+  "/usr/bin/chcon"
+  "/usr/bin/chacl"
+  "/usr/bin/setfacl"
+  "/usr/sbin/usermod"
+)
+for audit_item in "${audit_items[@]}"; do
+  audit_command="-w always,exit -F path=${audit_item} -F perm=x -F auid>=1000 -F key=$audit_key"
+  echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
+done
+
 rule_name="Record attempts to alter time"
 current_task "$rule_name"
-audit_key="time"
+audit_key="time-change"
 audit_rule_file="/etc/audit/rules.d/${audit_key}.rules"
 sudo touch "${audit_rule_file}"
 sudo chmod 0640 "${audit_rule_file}"
@@ -478,6 +527,23 @@ auditd_option_value="email"
 auditd_config_file="/etc/audit/auditd.conf"
 sudo sed -i "s/^${auditd_option_name}.*$/${auditd_option_name} = ${auditd_option_value}/" "${auditd_config_file}"
 
+rule_name="Ensure audit logs are not automatically deleted"
+current_task "$rule_name"
+auditd_option_name="max_log_file_action"
+auditd_option_value="keep_logs"
+auditd_config_file="/etc/audit/audit.conf"
+sudo sed -i "s/^${auditd_option_name}.*$/${auditd_option_name} = ${auditd_option_value}/" "${auditd_config_file}"
+
+rule_name="Ensure system is disabled when audit logs are full"
+current_task "$rule_name"
+auditd_option_name="disk_full_action"
+auditd_option_value="single"
+auditd_config_file="/etc/audit/audit.conf"
+sudo sed -i "s/^${auditd_option_name}.*$/${auditd_option_name} = ${auditd_option_value}/" "${auditd_config_file}"
+auditd_option_name="disk_error_action"
+auditd_option_value="syslog"
+sudo sed -i "s/^${auditd_option_name}.*$/${auditd_option_name} = ${auditd_option_value}/" "${auditd_config_file}"
+
 rule_name="Make the auditd Configuration Immutable"
 current_task "$rule_name"
 audit_key="immutable"
@@ -503,7 +569,9 @@ audit_commands=(
   "-w /etc/issue -p wa -k $audit_key"
   "-w /etc/issue.net -p wa -k $audit_key"
   "-w /etc/hosts -p wa -k $audit_key"
-  "-w /etc/sysconfig/network -p wa -k $audit_key"
+  "-w /etc/networks -p wa -k $audit_key"
+  "-w /etc/network/ -p wa -k $audit_key"
+  "-w /etc/netplan/ -p wa -k $audit_key"
 )
 for audit_command in "${audit_commands[@]}"; do
   echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
@@ -531,28 +599,35 @@ audit_rule_file="/etc/audit/rules.d/${audit_key}.rules"
 sudo touch "${audit_rule_file}"
 sudo chmod 0640 "${audit_rule_file}"
 audit_commands=(
-  "-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid"
-  "-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid"
-  "-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid"
-  "-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid"
+  "-a always,exit -F arch=b32 -S execve  -F auid!=unset -C uid!=euid -F euid=0 -k $audit_key"
+  "-a always,exit -F arch=b64 -S execve  -F auid!=unset -C uid!=euid -F euid=0 -k $audit_key"
+  "-a always,exit -F arch=b32 -S execve  -C euid!=uid -F auid!=unset -C gid!=egid -F egid=0 -k $audit_key"
+  "-a always,exit -F arch=b64 -S execve  -C euid!=uid -F auid!=unset -C gid!=egid -F egid=0 -k $audit_key"
 )
 for audit_command in "${audit_commands[@]}"; do
   echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
 done
 
-rule_name="Ensure auditd Collects System Administrator Actions"
+rule_name="Ensure changes to system administration scope (sudoers) are being collected"
 current_task "$rule_name"
-audit_key="actions"
+audit_key="scope"
 audit_rule_file="/etc/audit/rules.d/${audit_key}.rules"
 sudo touch "${audit_rule_file}"
 sudo chmod 0640 "${audit_rule_file}"
 audit_commands=(
   "-w /etc/sudoers -p wa -k $audit_key"
-  "-w /etc/sudoers.d/ -p wa -k $audit_key"
+  "-w /etc/sudoers.d -p wa -k $audit_key"
 )
 for audit_command in "${audit_commands[@]}"; do
   echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
 done
+
+rule_name="Ensure events that modify the sudo log are collected"
+current_task "$rule_name"
+audit_key="sudo_log_file"
+audit_rule_file="/etc/audit/rules.d/${audit_key}.rules"
+audit_command="-w /var/log/sudo.log -p wa -k ${audit_key}"
+echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
 
 rule_name="Record Events that Modify User/Group Information"
 current_task "$rule_name"
@@ -563,6 +638,9 @@ sudo chmod 0640 "${audit_rule_file}"
 audit_commands=(
   "-w /etc/group -p wa -k $audit_key"
   "-w /etc/gshadow -p wa -k $audit_key"
+  "-w /etc/nsswitch.conf -p wa -k $audit_key"
+  "-w /etc/pam.conf -p wa -k $audit_key"
+  "-w /etc/pam.d -p wa -k $audit_key"
   "-w /etc/passwd -p wa -k $audit_key"
   "-w /etc/security/opasswd -p wa -k $audit_key"
   "-w /etc/shadow -p wa -k $audit_key"
@@ -571,10 +649,19 @@ for audit_command in "${audit_commands[@]}"; do
   echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
 done
 
+rule_name="Ensure AppArmor is installed"
+current_task "$rule_name"
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y apparmor apparmor-utils
+
 rule_name="Ensure AppArmor is enabled in the bootloader configuration"
 current_task "$rule_name"
 sudo sed -i "s/\(^GRUB_CMDLINE_LINUX=\".*\)\"/\1 apparmor=1 security=apparmor\"/" '/etc/default/grub'
 sudo update-grub
+
+# remediation currently broken
+# rule_name="Ensure all AppArmor profiles are in enforcing mode"
+# current_task "$rule_name"
+# sudo aa-complain /etc/apparmor.d/*
 
 rule_name="Set the UEFI Boot Loader Password"
 current_task "$rule_name"
@@ -583,6 +670,13 @@ echo -e "set superusers=\"root\"\npassword_pbkdf2 root ${encrypted_grub_password
 # Allow booting without password
 sudo sed -i "s/\(^CLASS=\".*\)\"/\1 --unrestricted\"/" '/etc/grub.d/10_linux'
 sudo update-grub
+
+rule_name="Ensure access to the bootloader config is configured"
+current_task "$rule_name"
+sudo chown root:root /boot/grub/grub.cfg
+sudo chown root:root /boot/grub/grubenv
+sudo chmod 0400 /boot/grub/grub.cfg
+sudo chmod 0400 /boot/grub/grubenv
 
 rule_name="Ensure journald is configured to compress large log files"
 current_task "$rule_name"
@@ -598,11 +692,44 @@ journald_option_value="persistent"
 journald_config_file="/etc/systemd/journald.conf"
 sudo sed -i "s/#${journald_option_name}=.*/${journald_option_name}=${journald_option_value}/" "${journald_config_file}"
 
+rule_name="Ensure journald log file rotation is configured"
+current_task "$rule_name"
+journald_config_file="/etc/systemd/journald.conf"
+sudo sed -i --follow-symlinks 's/^#SystemMaxUse.*/SystemMaxUse=1G/' "${journald_config_file}"
+sudo sed -i --follow-symlinks 's/^#SystemKeepFree.*/SystemKeepFree=500M/' "${journald_config_file}"
+sudo sed -i --follow-symlinks 's/^#RuntimeMaxUse.*/RuntimeMaxUse=200M/' "${journald_config_file}"
+sudo sed -i --follow-symlinks 's/^#RuntimeKeepFree.*/RuntimeKeepFree=50M/' "${journald_config_file}"
+sudo sed -i --follow-symlinks 's/^#MaxFileSec.*/MaxFileSec=1month/' "${journald_config_file}"
+
+rule_name="Ensure systemd-journal-remote service is not in use"
+current_task "$rule_name"
+sudo systemctl stop systemd-journal-remote.socket systemd-journal-remote.service
+sudo systemctl mask systemd-journal-remote.socket systemd-journal-remote.service
+
+rule_name="Ensure a single firewall configuration utility is in use"
+current_task "$rule_name"
+sudo DEBIAN_FRONTEND=noninteractive apt-get remove -y iptables nftables
+
 rule_name="Configure Firewall"
 current_task "$rule_name"
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw allow ssh
+sudo ufw allow in on lo
+sudo ufw allow out on lo
+sudo ufw deny in from 127.0.0.0/8
+sudo ufw deny in from ::1
+sudo ufw deny in 53/tcp
+sudo ufw deny in 53/udp
+sudo ufw deny in 68/udp
+sudo ufw allow out on all
+sudo ufw allow out http
+sudo ufw allow out https
+sudo ufw allow out ntp
+sudo ufw allow out to any port 53
+sudo ufw allow out to any port 853
+sudo ufw logging on
+sudo ufw default deny outgoing
 sudo ufw --force enable
 sudo systemctl enable ufw.service
 sudo systemctl start ufw.service
@@ -651,21 +778,70 @@ for sysctl_param in "${sysctl_params[@]}"; do
 done
 sudo chmod a+r "$sysctl_config_file"
 
-rule_name="Disable Modules: DCCP, RDS, SCTP, TIPC, cramfs, freevxfs, jffs2, hfs, hfsplus, squashfs, udf, usb-storage"
+rule_name="Disable Kernel Modules"
 current_task "$rule_name"
 modules=(
+  "9p"
+  "adfs"
+  "affs"
+  "afs"
+  "autofs"
+  "bcachefs"
+  "befs"
+  "bfs"
+  "btrfs"
+  "cachefiles"
+  "ceph"
+  "coda"
   "cramfs"
   "dccp"
+  "dlm"
+  "efs"
+  "erofs"
+  "exfat"
+  "f2fs"
+  "fat"
   "freevxfs"
+  "fuse"
+  "gfs2"
   "hfs"
   "hfsplus"
+  "hpfs"
+  "isofs"
   "jffs2"
+  "jfs"
+  "lockd"
+  "minix"
+  "netfs"
+  "nfs_common"
+  "nfs"
+  "nfsd"
+  "nilfs2"
+  "nls"
+  "ntfs"
+  "ntfs3"
+  "ocfs2"
+  "omfs"
+  "orangefs"
+  "overlay"
+  "overlayfs"
+  "pstore"
+  "qnx4"
+  "quota"
   "rds"
+  "reiserfs"
+  "romfs"
   "sctp"
+  "smb"
   "squashfs"
+  "sysv"
   "tipc"
+  "ubifs"
   "udf"
+  "ufs"
   "usb-storage"
+  "vboxsf"
+  "zonefs"
 )
 for module in "${modules[@]}"; do
   module_file="/etc/modprobe.d/${module}-blacklist.conf"
@@ -759,6 +935,26 @@ rule_name="Verify Permissions (0600): /etc/crontab"
 current_task "$rule_name"
 sudo chmod u-xs,g-xwrs,o-xwrt /etc/crontab
 
+rule_name="Ensure crontab is restricted to authorized users"
+current_task "$rule_name"
+sudo touch /etc/cron.allow
+sudo chmod 640 /etc/cron.allow
+
+rule_name="Ensure access to all logfiles has been configured"
+current_task "$rule_name"
+log_files=(
+  "apt/history.log"
+  "landscape/sysinfo.log"
+  "sysstat/sa03"
+  "unattended-upgrades/unattended-upgrades-shutdown.log"
+  "dpkg.log"
+  "alternatives.log"
+)
+mode="0640"
+for log_file in "${log_files[@]}"; do
+  sudo chmod "${mode}" "/var/log/${log_file}"
+done
+
 rule_name="Disable Postfix Network Listening"
 current_task "$rule_name"
 sudo sed -i 's/inet_interfaces = all/inet_interfaces = loopback-only/' /etc/postfix/main.cf
@@ -785,9 +981,13 @@ for time_server in "${time_servers[@]}"; do
   echo "server $time_server iburst" | sudo tee -a /etc/chrony/chrony.conf
 done
 
-rule_name="Remove telnet Clients"
+rule_name="Remove ftp"
 current_task "$rule_name"
-sudo DEBIAN_FRONTEND=noninteractive apt-get remove -y telnet
+sudo DEBIAN_FRONTEND=noninteractive apt-get remove -y ftp tnftp
+
+rule_name="Remove telnet"
+current_task "$rule_name"
+sudo DEBIAN_FRONTEND=noninteractive apt-get remove -y telnet inetutils-telnet
 
 rule_name="Remove rsync Package"
 current_task "$rule_name"
@@ -800,9 +1000,11 @@ SSH_CONFIG_FILE_BACKUP="/etc/ssh/sshd_config.bak"
 sshd_options=(
   "AllowTcpForwarding no"
   "Banner /etc/issue.net"
-  "Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc"
+  "Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes256-gcm@openssh.com,aes128-gcm@openssh.com,-aes128-cbc,-3des-cbc,-aes192-cbc,-aes256-cbc"
   "ClientAliveCountMax 3"
   "ClientAliveInterval 300"
+  "DisableForwarding yes"
+  "GSSAPIAuthentication no"
   "HostbasedAuthentication no"
   "IgnoreRhosts yes"
   "LoginGraceTime 60"
@@ -837,16 +1039,34 @@ rule_name="Verify Permissions on SSH Server Config File"
 current_task "$rule_name"
 sudo chmod 0600 /etc/ssh/sshd_config
 
+rule_name="Verify permissions on SSH host keys"
+current_task "$rule_name"
+keys=(
+  "/etc/ssh/ssh_host_rsa_key"
+  "/etc/ssh/ssh_host_ecdsa_key"
+  "/etc/ssh/ssh_host_ed25519_key"
+)
+for key in "${keys[@]}"; do
+  sudo chmod 0600 "${key}"
+  sudo chmod 0600 "${key}.pub"
+done
+
 rule_name="Configure AIDE to Verify the Audit Tools"
 current_task "$rule_name"
 audit_tools=(
+  "/sbin/auditctl"
+  "/sbin/auditd"
+  "/sbin/augenrules"
+  "/sbin/aureport"
+  "/sbin/ausearch"
+  "/sbin/autrace"
+  "/usr/sbin/audispd"
   "/usr/sbin/auditctl"
   "/usr/sbin/auditd"
-  "/usr/sbin/ausearch"
-  "/usr/sbin/aureport"
-  "/usr/sbin/autrace"
   "/usr/sbin/augenrules"
-  "/usr/sbin/audispd"
+  "/usr/sbin/aureport"
+  "/usr/sbin/ausearch"
+  "/usr/sbin/autrace"
 )
 for audit_tool in "${audit_tools[@]}"; do
   if grep -i "${audit_tool}" /etc/aide/aide.conf; then
