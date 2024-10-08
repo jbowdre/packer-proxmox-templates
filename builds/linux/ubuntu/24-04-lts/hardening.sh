@@ -999,7 +999,7 @@ SSH_CONFIG_FILE_BACKUP="/etc/ssh/sshd_config.bak"
 sshd_options=(
   "AllowTcpForwarding no"
   "Banner /etc/issue.net"
-  "Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes256-gcm@openssh.com,aes128-gcm@openssh.com,-aes128-cbc,-3des-cbc,-aes192-cbc,-aes256-cbc"
+  "Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes256-gcm@openssh.com,aes128-gcm@openssh.com"
   "ClientAliveCountMax 3"
   "ClientAliveInterval 300"
   "DisableForwarding yes"
