@@ -945,7 +945,6 @@ current_task "$rule_name"
 log_files=(
   "apt/history.log"
   "landscape/sysinfo.log"
-  "sysstat/sa03"
   "unattended-upgrades/unattended-upgrades-shutdown.log"
   "dpkg.log"
   "alternatives.log"
