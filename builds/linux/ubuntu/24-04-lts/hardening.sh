@@ -433,7 +433,7 @@ new_data=()
 sudo touch "${audit_rule_file}"
 sudo chmod 0640 "${audit_rule_file}"
 for partition in $(findmnt -n -l -k -it $(awk '/nodev/ { print $2 }' /proc/filesystems | paste -sd,) | grep -Pv "noexec|nosuid" | awk '{print $1}'); do
-  readarray -t data < <(sudo find "${partition}" -xdev -perm /6000 -type f | awk -v UID_MIN=${uid_min} '{print "-a always,exit -F path=" $1 " -F perm=x -F auid>="uid_min" -F auid!=unset -k privileged" }')
+  readarray -t data < <(sudo find "${partition}" -xdev -perm /6000 -type f | awk -v uid_min=${uid_min} '{print "-a always,exit -F path=" $1 " -F perm=x -F auid>="uid_min" -F auid!=unset -k privileged" }')
   for entry in "${data[@]}"; do
     new_data+=("${entry}")
   done
