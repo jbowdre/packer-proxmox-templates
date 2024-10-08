@@ -1028,7 +1028,7 @@ sshd_options=(
 )
 for sshd_option in "${sshd_options[@]}"; do
   sshd_option_base=$(echo "${sshd_option}" | cut -d ' ' -f 1)
-  sudo LC_ALL=C sed -i "/^\s*${sshd_option_base}\s\+/Id" "${SSH_CONFIG_FILE}"
+  sudo LC_ALL=C sed -i "/^\s*#*\s*${sshd_option_base}\s\+/Id" "${SSH_CONFIG_FILE}"
   sudo cp "${SSH_CONFIG_FILE}" "${SSH_CONFIG_FILE_BACKUP}"
   line_number="$(sudo LC_ALL=C grep -n "^${sshd_option_base}" "${SSH_CONFIG_FILE_BACKUP}" | LC_ALL=C sed 's/:.*//g')"
   if [ -z "${line_number}" ]; then
