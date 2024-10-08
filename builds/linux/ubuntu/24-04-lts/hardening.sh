@@ -488,7 +488,7 @@ audit_items=(
   "/usr/sbin/usermod"
 )
 for audit_item in "${audit_items[@]}"; do
-  audit_command="-w always,exit -F path=${audit_item} -F perm=x -F auid>=1000 -F key=$audit_key"
+  audit_command="-a always,exit -F path=${audit_item} -F perm=x -F auid>=1000 -F key=$audit_key"
   echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
 done
 
