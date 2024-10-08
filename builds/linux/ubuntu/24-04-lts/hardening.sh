@@ -711,6 +711,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get remove -y iptables nftables
 
 rule_name="Configure Firewall"
 current_task "$rule_name"
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ufw
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw allow ssh
