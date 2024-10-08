@@ -703,7 +703,6 @@ sudo sed -i --follow-symlinks 's/^#MaxFileSec.*/MaxFileSec=1month/' "${journald_
 
 rule_name="Ensure systemd-journal-remote service is not in use"
 current_task "$rule_name"
-sudo systemctl stop systemd-journal-remote.socket systemd-journal-remote.service
 sudo systemctl mask systemd-journal-remote.socket systemd-journal-remote.service
 
 rule_name="Ensure a single firewall configuration utility is in use"
