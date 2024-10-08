@@ -591,17 +591,15 @@ for audit_command in "${audit_commands[@]}"; do
   echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
 done
 
-rule_name="Record Events When Privileged Executables are Run"
+rule_name="Ensure actions as another user are always logged"
 current_task "$rule_name"
-audit_key="privileged"
+audit_key="user_emulation"
 audit_rule_file="/etc/audit/rules.d/${audit_key}.rules"
 sudo touch "${audit_rule_file}"
 sudo chmod 0640 "${audit_rule_file}"
 audit_commands=(
-  "-a always,exit -F arch=b32 -S execve  -F auid!=unset -C uid!=euid -F euid=0 -k $audit_key"
-  "-a always,exit -F arch=b64 -S execve  -F auid!=unset -C uid!=euid -F euid=0 -k $audit_key"
-  "-a always,exit -F arch=b32 -S execve  -C euid!=uid -F auid!=unset -C gid!=egid -F egid=0 -k $audit_key"
-  "-a always,exit -F arch=b64 -S execve  -C euid!=uid -F auid!=unset -C gid!=egid -F egid=0 -k $audit_key"
+  "-a always,exit -F arch=b64 -C euid!=uid -F auid!=unset -S execve -k $audit_key"
+  "-a always,exit -F arch=b32 -C euid!=uid -F auid!=unset -S execve -k $audit_key"
 )
 for audit_command in "${audit_commands[@]}"; do
   echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
