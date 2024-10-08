@@ -941,6 +941,12 @@ current_task "$rule_name"
 sudo touch /etc/cron.allow
 sudo chmod 640 /etc/cron.allow
 
+rule_name="Ensure at is restricted to authorized users"
+current_task "$rule_name"
+sudo touch /etc/at.allow
+sudo chown root:daemon /etc/at.allow
+sudo chmod 0640 /etc/at.allow
+
 rule_name="Ensure access to all logfiles has been configured"
 current_task "$rule_name"
 log_files=(
