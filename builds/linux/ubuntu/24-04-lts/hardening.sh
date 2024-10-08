@@ -56,7 +56,7 @@ fi
 rule_name="Modify the System Login Banner | Modify the System Login Banner for Remote Connections"
 current_task "$rule_name"
 login_banner_text="Authorized users only. All activity may be monitored and reported."
-echo "$login_banner_text" | sudo tee -a /etc/issue | sudo tee -a /etc/issue.net
+echo "$login_banner_text" | sudo tee /etc/issue | sudo tee /etc/issue.net
 
 rule_name="Limit Password Reuse"
 current_task "$rule_name"
