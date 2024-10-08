@@ -110,7 +110,6 @@ sudo sed -i --follow-symlinks 's/nullok//' /etc/pam.d/common-auth
 
 rule_name="Ensure strong password hashing algorithm is configured"
 current_task "$rule_name"
-sudo sed -i --follow-symlinks 's/yescrypt$//' /etc/pam.d/common-password
 sudo sed -i --follow-symlinks 's/^ENCRYPT_METHOD.*/ENCRYPT_METHOD yescrypt/' /etc/login.defs
 
 rule_name="Set Interval For Counting Failed Password Attempts"
