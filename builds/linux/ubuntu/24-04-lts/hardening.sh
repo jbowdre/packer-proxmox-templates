@@ -997,7 +997,7 @@ sshd_options=(
   "IgnoreRhosts yes"
   "LoginGraceTime 60"
   "LogLevel VERBOSE"
-  "MACs hmac-sha2-512,hmac-sha2-384,hmac-sha2-256,hmac-sha1"
+  "MACs hmac-sha2-512,hmac-sha2-256,hmac-sha1"
   "MaxAuthTries 4"
   "MaxSessions 10"
   "MaxStartups 10:30:60"
