@@ -568,8 +568,8 @@ audit_commands=(
   "-w /etc/issue.net -p wa -k $audit_key"
   "-w /etc/hosts -p wa -k $audit_key"
   "-w /etc/networks -p wa -k $audit_key"
-  "-w /etc/network/ -p wa -k $audit_key"
-  "-w /etc/netplan/ -p wa -k $audit_key"
+  "-w /etc/network -p wa -k $audit_key"
+  "-w /etc/netplan -p wa -k $audit_key"
 )
 for audit_command in "${audit_commands[@]}"; do
   echo "${audit_command}" | sudo tee -a "${audit_rule_file}"
