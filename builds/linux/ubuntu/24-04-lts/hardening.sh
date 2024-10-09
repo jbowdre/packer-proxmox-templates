@@ -1027,18 +1027,6 @@ rule_name="Verify Permissions on SSH Server Config File"
 current_task "$rule_name"
 sudo chmod 0600 /etc/ssh/sshd_config
 
-rule_name="Verify permissions on SSH host keys"
-current_task "$rule_name"
-keys=(
-  "/etc/ssh/ssh_host_rsa_key"
-  "/etc/ssh/ssh_host_ecdsa_key"
-  "/etc/ssh/ssh_host_ed25519_key"
-)
-for key in "${keys[@]}"; do
-  sudo chmod 0600 "${key}"
-  sudo chmod 0600 "${key}.pub"
-done
-
 rule_name="Configure AIDE to Verify the Audit Tools"
 current_task "$rule_name"
 audit_tools=(
