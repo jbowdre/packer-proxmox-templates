@@ -281,7 +281,7 @@ sudo chmod 644 /etc/profile.d/tmout.sh
 
 rule_name="Ensure the audit Subsystem is Installed"
 current_task "$rule_name"
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y auditd
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y auditd audispd-plugins
 
 rule_name="Enable Auditing for Processes Which Start Prior to the Audit Daemon"
 current_task "$rule_name"
