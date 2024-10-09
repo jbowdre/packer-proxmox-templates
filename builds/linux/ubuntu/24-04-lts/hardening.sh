@@ -940,7 +940,7 @@ sudo chmod 640 /etc/cron.allow
 rule_name="Ensure at is restricted to authorized users"
 current_task "$rule_name"
 sudo touch /etc/at.allow
-sudo chown root:daemon /etc/at.allow
+sudo chown root:root /etc/at.allow
 sudo chmod 0640 /etc/at.allow
 
 rule_name="Disable Postfix Network Listening"
