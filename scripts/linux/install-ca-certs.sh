@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -eu
 # installs trusted CA certs from /tmp/certs/
-set -eu
 
 if awk -F= '/^ID/{print $2}' /etc/os-release | grep -q debian; then
   echo '>> Installing certificates...'

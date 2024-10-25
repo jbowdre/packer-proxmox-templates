@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -eu
 # basic sshd configuration
-set -eu
 
 echo '>> Configuring SSH...'
 sudo sed -i 's/.*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config

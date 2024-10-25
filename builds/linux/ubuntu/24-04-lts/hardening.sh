@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -eu
+#!/usr/bin/env -S bash -eu
 # Performs steps to harden Ubuntu 24.04 LTS toward the CIS Level 2 benchmark
 
 echo ">>> Beginning hardening tasks..."

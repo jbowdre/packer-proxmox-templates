@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -eu
 # ensures home directories are private
-set -eu
 
 echo '>> Setting homedir permissions...'
 sudo chmod 750 /home/*

@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -eu
 # waits for cloud-init to finish before proceeding
-set -eu
 
 echo '>> Waiting for cloud-init...'
 while [ ! -f /var/lib/cloud/instance/boot-finished ]; do

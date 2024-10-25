@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -eu
 # disables multipathd
-set -eu
 
 echo '>> Disabling multipathd...'
 sudo systemctl disable multipathd

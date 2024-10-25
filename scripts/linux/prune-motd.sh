@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -eu
 # prunes default noisy MOTD
-set -eu
 
 echo '>> Pruning default MOTD...'
 

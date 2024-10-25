@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -eu
 # ensures network settings are preserved on boot
-set -eu
 
 echo '>> Preserving network settings...'
 if grep -q 'manual_cache_clean' /etc/cloud/cloud.cfg; then
