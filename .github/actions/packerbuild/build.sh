@@ -1,8 +1,9 @@
-#!/usr/bin/env -S bash -eu
+#!/usr/bin/env bash
 # Run a single packer build
 #
 # Specify the build as an argument to the script. Ex:
 # ./build.sh ubuntu2204
+set -eu
 
 if [ $# -ne 1 ]; then
   echo """
