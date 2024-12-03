@@ -711,21 +711,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ufw
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw allow ssh
-sudo ufw allow in on lo
-sudo ufw allow out on lo
-sudo ufw deny in from 127.0.0.0/8
-sudo ufw deny in from ::1
-sudo ufw deny in 53/tcp
-sudo ufw deny in 53/udp
-sudo ufw deny in 68/udp
-sudo ufw allow out on all
-sudo ufw allow out http
-sudo ufw allow out https
-sudo ufw allow out ntp
-sudo ufw allow out to any port 53
-sudo ufw allow out to any port 853
 sudo ufw logging on
-sudo ufw default deny outgoing
 sudo ufw --force enable
 sudo systemctl enable ufw.service
 sudo systemctl start ufw.service
