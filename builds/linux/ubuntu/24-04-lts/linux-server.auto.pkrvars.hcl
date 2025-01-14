@@ -12,7 +12,7 @@ vm_guest_os_type        = "l26"
 
 //Virtual Machine Guest Partition Sizes (in MB)
 vm_guest_part_audit     = 4096
-vm_guest_part_boot      = 512
+vm_guest_part_boot      = 1024
 vm_guest_part_efi       = 512
 vm_guest_part_home      = 8192
 vm_guest_part_log       = 4096
