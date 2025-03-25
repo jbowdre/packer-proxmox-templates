@@ -260,6 +260,9 @@ if ! grep -q "^umask" /etc/profile; then
 else
   sudo sed -i -E -e "s/^(\s*umask).*/\1 $account_user_umask/g" /etc/profile
 fi
+# preserve readability of apt keyrings
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y acl
+sudo setfacl -R -d -m u::rwx,g::r-x,o::r-x /etc/apt/keyrings/ /usr/share/keyrings/
 
 rule_name="Ensure system accounts do not have a valid login shell"
 current_task "$rule_name"
