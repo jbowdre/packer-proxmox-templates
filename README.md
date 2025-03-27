@@ -1,5 +1,8 @@
 # Packer
 
+> [!NOTE]
+> This project has [moved](https://git.vim.wtf/wq/packer-proxmox-templates).
+
 Build Linux server templates on Proxmox with Packer ([proxmox-iso](https://developer.hashicorp.com/packer/integrations/hashicorp/proxmox/latest/components/builder/iso))
 
 ### Requirements
